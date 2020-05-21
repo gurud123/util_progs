@@ -1,0 +1,58 @@
+#include "stdio.h"
+
+int bitmap[256];
+
+void
+update_bitmap(int vid)
+{
+    int byte, bit;
+    
+    byte = bit = 0;
+    bit = vid % 8;
+    byte = vid/8;
+    bitmap[byte] = bitmap[byte] | (1 << bit);
+    printf("Value of bitmap is 0x%x byte = %d bit = %d",
+    bitmap[byte],byte,bit);
+    return;
+}
+
+unsigned int
+get_set_vlan()
+{
+    char val = 0;
+    int i=0;
+    char bit=0,mask = 0x0;
+    
+    for(i=0;i<256;i++){
+        if(bitmap[i]==0)
+            continue;
+        val = bitmap[i];
+        break;
+    }
+    bit = 7;
+    
+    while(bit > 0){
+        mask = 1<<bit;
+        if(val & mask){
+            break;
+        }
+        bit--;
+    }
+    return ((i*8)+bit);
+}
+
+int main()
+{
+    int vlan = 1005;
+    short int port = 20;
+    int lif=0;
+    int my_vid = 0;
+    
+    lif = vlan;
+    lif = lif << 8;
+    lif += port;
+    printf("\nsizeof(lif) is %lu lif is %d(0x%x) vlan:0x%x \n",sizeof(lif),lif,lif,vlan);
+    update_bitmap(vlan);
+    my_vid = get_set_vlan();
+    printf("\n Value obtained from bitmap is vid=%d",my_vid);
+}
